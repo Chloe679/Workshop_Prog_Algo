@@ -1,21 +1,117 @@
 # 🐣 S1 | Prog: Workshop
 
-Workshop prog algo - Chloé CHABAUD
+# # Workshop prog algo - Chloé CHABAUD
+
 Exercice n°1 : Ne garder que le vert
 Mettre le bleu et le rouge à 0.
 ![](./output/greenImage.png)
 
 Exercice n°2 : Échanger les canaux
 Avec swap.
+![](./output/swichCanal.png)
 
 Exercice n°3 : Noir et blanc
 Grace à la formule de luminance (rouge0.3 + vert0.59 + bleu\*0.11)
+![](./output/BlackAndWhite.png)
 
 Exercice n°4 : Négatif
-1-couleur pour avoir l'inverse.
+calcul : 1-couleur, pour avoir l'inverse.
+![](./output/Negatif.png)
 
 Exercice n°5 : Dégradé
 Equivalent de map en Processing puis (gris, gris, gris) pour les couleurs.
+![](./output/Gradient.png)
 
-Exercice n°6 : Inverse
-Au départ je n'avais pas stocker l'image de référence, et j'obtenais une symétrie.
+Exercice n°6 : Miroir
+Avec fonction swap et la formule pixel=image.width() - (1+x)
+![](./output/Miror.png)
+
+![](./output/inverse.png)
+
+## Exercice n°7 : Bruits
+
+nbr de pixels bruités aléatoires (entre 1 et la moitié du nbr de pixels total). Pixels choisis aléatoirement et nouvelle couleur aléatoire
+![](./output/Bruit.png)
+
+## Exercice n°8 : Rotation 90°
+
+J'ai eu du mal à comprendre quelle formule utiliser. Mais j'avais compris qu'il fallait inversrer les axes x et y. Puis j'ai remarqué qu'il fallait faire "miroir" sur le nouvel axe des x. Ainsi j'ai obtenue le résultat suivant:
+
+![](./images/Rotation.jpg)
+
+## Exercice n°9 : RGB Split
+
+Grâce aux indications j'ai éviter le pièges et ai créé une nouvelle image.
+
+J'ai d'abord mis un décalagé de 1px, mais le résultat ne se voyait pas. J'ai alors augmenter à 50px.
+J'ai ensuite eu du mal à gérer les débordement.
+J'ai donc calculé en amont la somme des pixels avec décalage, puis en fonction du débordement ou pas, changer les affectation au nouveau pixel.
+
+![](./output/Split.png)
+
+## Exercice n°10 : Luminosité
+
+Puissance 3 pour assombrir et puissance 0,2 pour éclairer.
+
+![](./output/Sombre.png)
+![](./output/Clair.png)
+
+## Exercice n°11 : Disque
+
+On a un cercle qui a pour centre le point [width/2, height/2] et pour rayon R.
+L'équation caractéritique du cercle est :
+
+> (x−cx)² + (y−cy)² ≤ R²
+
+Si (x−cx)² + (y−cy)² < R² alors le point est à l’intérieur du disque.
+Si (x−cx)² + (y−cy)² = R² alors le point est sur le contour
+Si (x−cx)² + (y−cy)² > R² alors le point est à l’extérieur
+
+![](./output/Disque.png)
+
+### Partie 2 : cercle
+
+Pour le cercle, j'ai simplement ajouté une condition : le point doit être a l'exterieur du cercle de rayon R-épaisseur ( avec R rayon du disque précédent).
+
+![](./output/Cercle.png)
+
+### Partie 2 : Animation
+
+### Partie 3 : Rosace
+
+Transformation coordonnée cartésiens en polaire avec cos et sin
+Puis j'ai divisé mon cercle (2\*pi) en le nombre de cercle que l'on veut. Ouis pr chaque itération je me ballade sur le cercle trigo
+Au début, j'avais mis mon angle theta en int au lieu de float donc cela a crééer ce léger décalage :
+
+Avec rectification:
+![](./output/Rosace.png)
+
+## Exercice n°12 : Mosaïque
+
+J'ai utilisé le modulo pour "me ballader" sur l'image de base. Ainsi tout les "longueur de l'image" je reviens au début et je répète le pixel sur la nouvelle image
+J'ai fait un premier test où la fenêtre n'étais pas assez grande donc je ne voyait pas les répetitons. Après avoir (enfin) compris j'ai augmenté.
+
+![](./output/Mosaique.png)
+
+### Partie 2 : Mosaïque inversée
+
+J'ai commencé par définir 4 les formes possibles de l'image
+(inversé selon x ou pas ET/OU inversé selon axe y)
+
+Il m'a suffit ensuite de le retranscrire en code pour obtenir le résultat :
+
+![](./output/MosaiqueMiroir.png)
+
+## Exercice n°13 : Glitch
+
+Le seul problème que j'ai rencontré est qu'en laissant une longueur et une largeur aléatoire aux rectangles, j'avais parfois un dépassement.
+J'ai donc ajouté des conditions au moment des choix aléatoires : Choisir le minimum entre le nbr aléatoire et l'espace qu'il reste avant de dépasser pour un des deux rectangles.
+
+![](./output/Glitch.png)
+
+## Exercice n°15 : Fractale
+
+J'ai rencontré des difficultés pour modifier les coordonnées x et y pour les avoir dans les intervalles pertinent.
+Puis, j'ai rencontré le problème des couleurs, je n'ai pas de nuance de gris, que de noirs et du blanc
+
+![](./output/Fractale.png)
