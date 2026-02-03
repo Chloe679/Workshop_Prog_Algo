@@ -363,10 +363,6 @@ int nbrect=random_int(1, 80); //nb rectangle
 //pour être dans -2 2 on veut une fonction qui quand x=0 donne -2 et quand x=image.width donne 2
 sil::Image Fractale(){
     sil::Image image{500, 500};
-    //int xmax=2;
-    //int xmin=-2;
-    //int ymin=-1.5;
-    //int ymax=1.5;
     float a{};
     float b{}; // z=a+ib
     int itemax=200;
@@ -375,7 +371,7 @@ sil::Image Fractale(){
    for (int x = 0; x < image.width(); x++){
             for (int y = 0; y < image.height(); y++)
             {      
-                 a= ((x/500.f) *3-2);
+                a= ((x/500.f) *3-2);
                 b= ((y/500.f) *3-1.5);
                 std::complex<float> c{a, b}; // c=a+ib
                 int ite=1;
@@ -385,12 +381,12 @@ sil::Image Fractale(){
                     z=z*z+c;
                     ite+=1;
                     
-                 
+                
                 }
-                    int color = int(ite / itemax);
-                    image.pixel(x, y).r = color*10;
-                    image.pixel(x, y).g = color*40;
-                    image.pixel(x, y).b = color*100;
+                    float color = ite / itemax;
+                    image.pixel(x, y).r = color;
+                    image.pixel(x, y).g = color;
+                    image.pixel(x, y).b = color;
             }
                    
    }
@@ -398,6 +394,7 @@ sil::Image Fractale(){
 return image;
                
 }
+
 
 
 
