@@ -1,5 +1,10 @@
 #include <sil/sil.hpp>
 #include "random.hpp"
+#include <cmath>
+#include<complex>
+
+
+
 void greenImage(sil::Image &image)
 {
     for (int x{0}; x < image.width(); x++)
@@ -222,9 +227,177 @@ sil::Image Cercle(){
 }
 
 
+sil::Image Rosace(){
+        sil::Image image{300, 300};
+        int rayon = 50;
+        float teta=0;
+        int thickness = 3;
+    for (int nb=0; nb<6;nb++){
+        teta= 3.14 *2*nb/6;
+        int Xcentre = image.width()/2+rayon*cos(teta);
+        int Ycentre = image.height()/2+rayon*sin(teta);
+
+        for (int x = 0; x < image.width(); x++){
+            for (int y = 0; y < image.height(); y++)
+            {
+                if (
+                    (pow(x - Xcentre, 2) + pow(y - Ycentre, 2) < pow(rayon, 2)) &&
+                    (pow(x - Xcentre, 2) + pow(y - Ycentre, 2) > pow(rayon - thickness, 2))
+                ) {
+                    image.pixel(x,y).r = 1;
+                    image.pixel(x,y).g = 1;
+                    image.pixel(x,y).b = 1; // blanc
+                }
+            }
+        }
+         Xcentre = image.width() / 2;
+         Ycentre = image.height() / 2;
+
+    for (int x = 0; x < image.width(); x++){
+        for (int y = 0; y < image.height(); y++)
+        {
+            if (
+                (pow(x - Xcentre, 2) + pow(y - Ycentre, 2) < pow(rayon, 2)) &&
+                (pow(x - Xcentre, 2) + pow(y - Ycentre, 2) > pow(rayon - thickness, 2))
+            ) {
+                image.pixel(x,y).r = 1;
+                image.pixel(x,y).g = 1;
+                image.pixel(x,y).b = 1; // blanc
+            }
+        }
+    }
+    }
+        return image;
+}
 
 
+sil::Image Mosaique(sil::Image& image){ 
+    sil::Image newimage{1000, 1000}; //augmenetr car on voit pas
+    int sourcex;
+    int sourcey;
+     for (int x{0}; x < newimage.width(); x++)
+    {
+        for (int y{0}; y < newimage.height(); y++)
+        {
+            sourcex=x%image.width();
+            sourcey=y%image.height();
+            newimage.pixel(x,y)= image.pixel(sourcex,sourcey);
+        }
+    }
+return newimage;
+}
 
+
+sil::Image MosaiqueMiroir(sil::Image& image){ 
+    sil::Image newimage{1000, 1000}; //augmenetr car on voit pas
+    int sourcex;
+    int sourcey;
+    
+    int miroir=0;
+     for (int x{0}; x < newimage.width(); x++)
+    {
+        for (int y{0}; y < newimage.height(); y++)
+        {
+            int indX=x/image.width();
+            int indY=y/image.height();
+            if((indX%2==0)&&(indY%2==0)){ //aucun miroir
+            
+                sourcex=x%image.width();
+                sourcey=y%image.height();
+                newimage.pixel(x,y)= image.pixel(sourcex,sourcey);
+            }
+            else if ((indX%2==0)&&(indY%2==1)){ //inverse horizon
+                sourcex=x%image.width();
+                sourcey=image.height()-1-y%image.height();
+                newimage.pixel(x,y)= image.pixel(sourcex,sourcey);
+            }
+            else if ((indX%2==1)&&(indY%2==0)){ //inverse verticalement
+                sourcex=image.width()-1-x%image.width();
+                sourcey=y%image.height();
+                newimage.pixel(x, y) = image.pixel(sourcex, sourcey);
+        }
+            else if ((indX%2==1)&&(indY%2==1)){ //inverse tout
+                sourcex=image.width()-1-x%image.width();
+                sourcey=image.height()-1-y%image.height();
+                newimage.pixel(x, y) = image.pixel(sourcex, sourcey);
+        }
+    }
+    }
+return newimage;
+}
+
+//vérifier dépasse pas, puis que largeur rectangle était bien
+void Glitch(sil::Image& image){
+int x1{}; //pixel
+int y1{};
+int x2{};
+int y2{};
+int h{}; //hauteur rectangle
+int l{};//largeur
+int nbrect=random_int(1, 80); //nb rectangle
+ for (int i{0};i<nbrect;i++){
+    x1=random_int(0, image.width()-1);
+     y1=random_int(0, image.height()-1);
+     x2=random_int(0, image.width()-1);
+     y2=random_int(0, image.height()-1);
+     h=random_int(1, std::min(10, std::min(image.height() - y1,image.height() - y2))); //hauteur des rect du changement
+     l=random_int(1, std::min(20, std::min(image.width() - x1,image.width() - x2))); //largeur sasndépasser image
+    //on parcourt les deux rectangle pr échanger
+    for (int x{0}; x <l; x++)
+    {
+        for (int y{0}; y < h; y++)
+        {
+            std::swap(image.pixel(x1+x,y1+y).r,image.pixel(x2+x,y2+y).r);
+            std::swap(image.pixel(x1+x,y1+y).b,image.pixel(x2+x,y2+y).b);
+            std::swap(image.pixel(x1+x,y1+y).g,image.pixel(x2+x,y2+y).g);
+            
+            
+            
+        }
+    }
+    
+
+    }
+}
+
+//pour être dans -2 2 on veut une fonction qui quand x=0 donne -2 et quand x=image.width donne 2
+sil::Image Fractale(){
+    sil::Image image{500, 500};
+    //int xmax=2;
+    //int xmin=-2;
+    //int ymin=-1.5;
+    //int ymax=1.5;
+    float a{};
+    float b{}; // z=a+ib
+    int itemax=200;
+    std::complex<float> c{a, b}; // c=a+ib
+    //valeur aléatoire
+   for (int x = 0; x < image.width(); x++){
+            for (int y = 0; y < image.height(); y++)
+            {      
+                 a= ((x/500.f) *3-2);
+                b= ((y/500.f) *3-1.5);
+                std::complex<float> c{a, b}; // c=a+ib
+                int ite=1;
+                std::complex<float> z{0.f, 0.f};
+                while (std::abs(z) < 2 && ite< itemax){
+                   
+                    z=z*z+c;
+                    ite+=1;
+                    
+                 
+                }
+                    int color = int(ite / itemax);
+                    image.pixel(x, y).r = color*10;
+                    image.pixel(x, y).g = color*40;
+                    image.pixel(x, y).b = color*100;
+            }
+                   
+   }
+
+return image;
+               
+}
 
 
 
@@ -295,5 +468,29 @@ int main()
 
      { sil::Image image=Cercle();
         Cercle().save("output/Cercle.png");
+    }
+
+    
+     { sil::Image image=Rosace();
+        Rosace().save("output/Rosace.png");
+    }
+
+     {
+       Mosaique(sil::Image{"images/logo.png"}).save("output/Mosaique.png");
+
+    }
+
+    {
+       MosaiqueMiroir(sil::Image{"images/logo.png"}).save("output/MosaiqueMiroir.png");
+
+    }
+       {
+        sil::Image image{"images/logo.png"};
+        Glitch(image);
+        image.save("output/Glitch.png");
+    }
+
+    { sil::Image image=Fractale();
+        image.save("output/Fractale.png");
     }
     }
