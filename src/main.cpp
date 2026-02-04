@@ -365,7 +365,7 @@ sil::Image Fractale(){
     sil::Image image{500, 500};
     float a{};
     float b{}; // z=a+ib
-    int itemax=200;
+    int itemax=50;
     std::complex<float> c{a, b}; // c=a+ib
     //valeur aléatoire
    for (int x = 0; x < image.width(); x++){
@@ -395,8 +395,156 @@ return image;
                
 }
 
+sil::Image DegradeColor1(){
+
+    sil::Image image{300, 200}; //on cree une image en noire 
+    for (int x{0}; x < image.width(); x++)
+    {
+
+        for (int y{0}; y < image.height(); y++)
+        {
+            float pourcentage= float(x)/float(image.width() - 1);
+             //on cree les vecteurs couleur rouge et vert
+             glm::vec3 rouge (1.f,0.f,0.f);
+             glm::vec3 vert(0.f,1.f,0.f);
+             //couleur mélangée
+             glm::vec3 couleur= glm::mix(rouge, vert, pourcentage);
+             //couleur au pixel
+             image.pixel(x,y).r= couleur.r;
+             image.pixel(x,y).b= couleur.b;
+             image.pixel(x,y).g= couleur.g;      
+        }
+    }
+    return image;
+}
+/////////////////////////////////////////////////////////////////////////////////////////
+struct Lab{ float L; float a; float b;};
+    Lab linear_srgb_to_oklab(glm::vec3 c){
+            //transfo oklab
+            float l = 0.4122214708f * c.r + 0.5363325363f * c.g + 0.0514459929f * c.b;
+	        float m = 0.2119034982f * c.r + 0.6806995451f * c.g + 0.1073969566f * c.b;
+	        float s = 0.0883024619f * c.r + 0.2817188376f * c.g + 0.6299787005f * c.b;
+            //racine cubique
+                float l_ = cbrtf(l);
+                float m_ = cbrtf(m);
+                float s_ = cbrtf(s);
+            // Tranfo en OKLab
+            return 
+        {0.2104542553f*l_ + 0.7936177850f*m_ - 0.0040720468f*s_,
+        1.9779984951f*l_ - 2.4285922050f*m_ + 0.4505937099f*s_,
+        0.0259040371f*l_ + 0.7827717662f*m_ - 0.8086757660f*s_,};
+}
 
 
+//on revient en RGB
+glm::vec3 oklab_to_linear_srgb(Lab c){
+    float l_ = c.L + 0.3963377774f * c.a + 0.2158037573f * c.b;
+    float m_ = c.L - 0.1055613458f * c.a - 0.0638541728f * c.b;
+    float s_ = c.L - 0.0894841775f * c.a - 1.2914855480f * c.b;
+    //puissance 3
+    float l = pow(l_,3);
+    float m =pow(m_,3);
+    float s = pow(s_,3);
+    //Tranfo en rgb
+       return {
+		+4.0767416621f * l - 3.3077115913f * m + 0.2309699292f * s,
+		-1.2684380046f * l + 2.6097574011f * m - 0.3413193965f * s,
+		-0.0041960863f * l - 0.7034186147f * m + 1.7076147010f * s,
+    };
+}
+
+glm::vec3 sRGB_to_Linear(glm::vec3 c){
+    //on parcourt les 3 composante de c
+    for (int i=0;i<3;i++){
+        if (c[i]<=0.04045){
+            c[i]=c[i]/12.92;
+        }
+        else{
+            c[i]=pow(((c[i]+0.055)/1.055),2.4);
+        }
+    }
+    return c;
+}
+
+glm::vec3 Linear_to_sRGB(glm::vec3 l){
+    //on parcourt les 3 composante de c
+    for (int i=0;i<3;i++){
+        if (l[i]<=0.0031308){
+            l[i]=l[i]*12.92;
+        }
+        else{
+            l[i]=(pow(l[i],(1/2.4)))*1.055-0.055;
+        }
+    }
+    return l;
+}
+
+
+
+
+
+
+//application à tous les pixels
+sil::Image DegradeColor2(){
+    sil::Image image{300,200};
+    //on cree les vecteurs couleur rouge et vert
+                glm::vec3 rouge (1.f,0.f,0.f);
+                glm::vec3 vert(0.f,1.f,0.f);
+
+            //on transforme en lineare puis OKlab
+                Lab rougeLab =linear_srgb_to_oklab(sRGB_to_Linear(rouge));
+                Lab vertLab = linear_srgb_to_oklab(sRGB_to_Linear(vert));
+
+    for (int x{0}; x < image.width(); x++)
+    {
+        for (int y{0}; y < image.height(); y++)
+            {
+                //on fait le mix à lq main
+                float pourcentage= float(x)/float(image.width() - 1);
+                Lab mixLab;
+                mixLab.L = rougeLab.L + pourcentage * (vertLab.L - rougeLab.L);
+                mixLab.a = rougeLab.a + pourcentage * (vertLab.a - rougeLab.a);
+                mixLab.b = rougeLab.b + pourcentage * (vertLab.b - rougeLab.b);
+
+                
+               //interpolation linéaire en OK lab
+               glm::vec3 resultat= Linear_to_sRGB(oklab_to_linear_srgb(mixLab));
+                //uitlisation de clamp pr rester dans le bon intervalle
+                image.pixel(x,y).r= glm::clamp(resultat.r, 0.f,1.f);
+                image.pixel(x,y).g= glm::clamp(resultat.g, 0.f,1.f);
+                image.pixel(x,y).b= glm::clamp(resultat.b, 0.f,1.f);
+
+            }
+             
+
+        }
+        return image;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    ///////////////////////////////////////
+   
+/*
+//image pixel sil color != de vec3
+//image.pixel(x,y).r est un float
+//faut etre dans intervalle
+//faut mix à la main
+*/
 
 int main()
 {
@@ -490,4 +638,12 @@ int main()
     { sil::Image image=Fractale();
         image.save("output/Fractale.png");
     }
+
+    {sil::Image image = DegradeColor1();
+        image.save("output/DegradeColor1.png");
     }
+
+    {sil::Image image = DegradeColor2();
+        image.save("output/DegradeColor2.png");
+    }
+}

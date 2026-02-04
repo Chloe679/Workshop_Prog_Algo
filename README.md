@@ -4,14 +4,17 @@
 
 Exercice n°1 : Ne garder que le vert
 Mettre le bleu et le rouge à 0.
+
 ![](./output/greenImage.png)
 
 Exercice n°2 : Échanger les canaux
 Avec swap.
+
 ![](./output/swichCanal.png)
 
 Exercice n°3 : Noir et blanc
 Grace à la formule de luminance (rouge0.3 + vert0.59 + bleu\*0.11)
+
 ![](./output/BlackAndWhite.png)
 
 Exercice n°4 : Négatif
@@ -111,7 +114,22 @@ J'ai donc ajouté des conditions au moment des choix aléatoires : Choisir le mi
 
 ## Exercice n°15 : Fractale
 
-J'ai rencontré des difficultés pour modifier les coordonnées x et y pour les avoir dans les intervalles pertinent.
-Puis, j'ai rencontré le problème des couleurs, je n'ai pas de nuance de gris, que de noirs et du blanc
+J'ai rencontré des difficultés pour modifier les coordonnées x et y pour les avoir dans les intervalles pertinents.
+Puis, j'ai rencontré le problème des couleurs, je n'ai pas de nuances de gris, que de noirs et du blanc
 
 ![](./output/Fractale.png)
+
+## Exercice n°16 : Dégradé Couleur 1
+
+J'ai repris le code du D2gardé noir et blanc. J'ai ensuite utilisé la fonction qui permettait d'avoir le pourcentage de noir, pour avoir un pourcentage en paramètre de la fct mix.
+![](./output/DegradeColor1.png)
+
+## Exercice n°16 : Dégradé Couleur LAB
+
+J'ai eu beaucoup plus de difficulté avec cette parrie. Je mélangeait les types ( image.pixel =! sil::vec3, image.pixel(x,y)=! image.pixel(x,y).r etc...)
+J'ai ensuite eu du mal à comprendre dans quel ordre appliqué les transformation, mais grace à mes camarades j'ai réussi (sRGB->lin->OKLab->lin->sRGB).
+Je ne connaissais pas la fonction glm::clamp qui permettait d'atterrir dans un intervalle définie, ce qui m'a bloquée un moment.
+Enfin, la fonction mix ne fonctionne que pour des ouleur en sRGB donc il a fallu l'écrire à la main.
+Finalement j'ai réussi à obtenir un meilleur dégradé garce à cette méthode:
+
+![](./output/DegradeColor2.png)
