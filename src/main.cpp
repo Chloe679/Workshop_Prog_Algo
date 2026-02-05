@@ -2,6 +2,8 @@
 #include "random.hpp"
 #include <cmath>
 #include<complex>
+#include <glm/gtx/matrix_transform_2d.hpp>
+#include<vector> 
 
 
 
@@ -227,6 +229,8 @@ sil::Image Cercle(){
 }
 
 
+
+
 sil::Image Rosace(){
         sil::Image image{300, 300};
         int rayon = 50;
@@ -359,6 +363,49 @@ int nbrect=random_int(1, 80); //nb rectangle
 
     }
 }
+
+void Tri_pixel(sil::Image& image){
+    sil::Image origine_image = image;
+    int w = origine_image.width();
+    int h = origine_image.height();
+//on parcourt ligne par ligne
+    for(int y=0; y<h; y++){
+        int nb = random_int(1, 10); // nbr de rectangles par lignes
+        for(int r=0; r<nb; r++){
+            //on determine début du glitch et sa longueur
+            int x_begin = random_int(0, w-1);
+            int longueur = random_int(1, std::min(20, w - x_begin));
+            //index car tableau portion est en 1D
+            int index_debut = x_begin + y * w;  //on tranforme en 1D
+            int index_fin = std::min(index_debut + longueur, (int)origine_image.pixels().size()); //pour ne pas dépasser
+
+            // Copier la portion dans un nv tableau "portion"
+            std::vector<glm::vec3> portion(
+                origine_image.pixels().begin() + index_debut,
+                origine_image.pixels().begin() + index_fin
+            );
+
+            // Trier selon luminosité
+            std::sort(portion.begin(), portion.end(), [](glm::vec3 const& c1, glm::vec3 const& c2){
+                float moy1 = (c1.r + c1.g + c1.b) / 3.f; 
+                float moy2 = (c2.r + c2.g + c2.b) / 3.f;
+                return moy1 < moy2;
+            });
+
+            // Réécrire dans l'image
+            for(int i=0; i<(int)portion.size(); i++){
+                origine_image.pixels()[index_debut + i] = portion[i];
+            }
+        }
+    }
+
+    // Remplacer l'image originale
+    image = origine_image;
+}
+
+    
+
+
 
 //pour être dans -2 2 on veut une fonction qui quand x=0 donne -2 et quand x=image.width donne 2
 sil::Image Fractale(){
@@ -497,8 +544,7 @@ sil::Image DegradeColor2(){
 
     for (int x{0}; x < image.width(); x++)
     {
-        for (int y{0}; y < image.height(); y++)
-            {
+        for (int y{0}; y < image.height(); y++){
                 //on fait le mix à lq main
                 float pourcentage= float(x)/float(image.width() - 1);
                 Lab mixLab;
@@ -514,13 +560,86 @@ sil::Image DegradeColor2(){
                 image.pixel(x,y).g= glm::clamp(resultat.g, 0.f,1.f);
                 image.pixel(x,y).b= glm::clamp(resultat.b, 0.f,1.f);
 
-            }
-             
-
         }
+    }
         return image;
         }
 
+ ////////////////////////////////////////////////////////////////////////////////////////////////
+        //FCT CALCUL LUMINISCNACE
+        float Luminisance (glm::vec3& pixel){
+            return 0.2126f * pixel.r + 0.7152f * pixel.g + 0.0722f * pixel.b;}
+
+sil::Image Normalisation(sil::Image image) {
+    float maxlu = -1.f;
+    float minlu = 2.f;
+
+    // recherche min et max
+    for (int x = 0; x < image.width(); x++) {
+        for (int y = 0; y < image.height(); y++) {
+            float lum = Luminisance(image.pixel(x,y));
+            if (lum > maxlu){
+             maxlu = lum;}
+            if (lum < minlu){
+                minlu = lum;}
+    }
+    }
+//vérifie pas division par 0
+    float range = maxlu - minlu;
+    if (range < 1e-6f) range = 1.f;
+
+    // normalisation
+    for (int x = 0; x < image.width(); x++) {
+        for (int y = 0; y < image.height(); y++) {
+            glm::vec3 pix = image.pixel(x,y);
+            float lum = Luminisance(pix);
+            float factor = (lum - minlu) / range;
+
+            image.pixel(x,y).r= pix.r*factor;
+            image.pixel(x,y).g= pix.g*factor;
+            image.pixel(x,y).b= pix.b*factor;
+        }
+    }
+
+
+    return image;}
+
+/////////////////////////////////////////////////////////////////////////////////
+//fonction rotation
+
+glm::vec2 rotated(glm::vec2 point, glm::vec2 center_of_rotation, float angle)
+{
+    return glm::vec2{glm::rotate(glm::mat3{1.f}, angle) * glm::vec3{point - center_of_rotation, 0.f}} + center_of_rotation;
+}
+
+sil::Image Vortex(sil::Image image) {
+    sil::Image newimage{image.width(), image.height()}; //nv image 
+    //coordonnée du centre
+    int Xcentre=image.width()/2;
+    int Ycentre=image.height()/2;
+    glm::vec2 center {Xcentre,Ycentre};
+    float angle=0.f;
+    for (int x = 0; x < image.width(); x++) {
+            for (int y = 0; y < image.height(); y++) {
+                glm::vec2 pos{x, y}; //position actuelle
+                float dis=glm::distance(center,pos); //calcule distance
+                angle=dis/sqrt(image.width()*image.width()+image.height()*image.height())*40; //distance sur diago * pi2 jsp pq
+                glm::vec2 newpos=rotated(pos,center ,angle);//calcule nv position
+                int nx = static_cast<int>(newpos.x); //on transfo en entier les coo =rdonnée de la nv position
+                int ny = static_cast<int>(newpos.y);
+//on vérifie qu'on est pas en dehors de l'image
+            if (nx >= 0 && nx < image.width() &&
+                ny >= 0 && ny < image.height()) {
+                newimage.pixel(x, y) = image.pixel(nx, ny);
+            }
+            //sinon on fait rien
+
+            }
+    }
+    return newimage;
+}
+
+//il faut recreer une image
 
 
 
@@ -529,22 +648,6 @@ sil::Image DegradeColor2(){
 
 
 
-
-
-
-
-
-
-
-
-    ///////////////////////////////////////
-   
-/*
-//image pixel sil color != de vec3
-//image.pixel(x,y).r est un float
-//faut etre dans intervalle
-//faut mix à la main
-*/
 
 int main()
 {
@@ -646,4 +749,18 @@ int main()
     {sil::Image image = DegradeColor2();
         image.save("output/DegradeColor2.png");
     }
+
+    {
+        sil::Image image{"images/photo_faible_contraste.jpg"};
+        Normalisation(image).save("output/Normalisation.png");
+    }
+
+    {
+        sil::Image image{"images/logo.png"};
+        Vortex(image).save("output/Vortex.png");
+    }
+
+    {sil::Image image{"images/logo.png"};
+        Tri_pixel(image);
+        image.save("output/Tri.png");}
 }

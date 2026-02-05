@@ -80,6 +80,9 @@ Pour le cercle, j'ai simplement ajouté une condition : le point doit être a l'
 
 ### Partie 2 : Animation
 
+J'au créé 2à image pour faire ce GIF.
+![](./output/Animation.gif)
+
 ### Partie 3 : Rosace
 
 Transformation coordonnée cartésiens en polaire avec cos et sin
@@ -112,6 +115,11 @@ J'ai donc ajouté des conditions au moment des choix aléatoires : Choisir le mi
 
 ![](./output/Glitch.png)
 
+## Exercice n°14 : Tri pixels
+
+J'ai vraiment galéré à trouver la logique. Mais grace à l'aide de mes camardes (Agathe enfaite) j'ai pu avancer.
+![](./output/Tri.png)
+
 ## Exercice n°15 : Fractale
 
 J'ai rencontré des difficultés pour modifier les coordonnées x et y pour les avoir dans les intervalles pertinents.
@@ -133,3 +141,20 @@ Enfin, la fonction mix ne fonctionne que pour des ouleur en sRGB donc il a fallu
 Finalement j'ai réussi à obtenir un meilleur dégradé garce à cette méthode:
 
 ![](./output/DegradeColor2.png)
+
+## Exercice n°18 : Normalisation de l'histogramme
+
+Mon code ne changeait pas l'image au début car je modifiait les 3 composante r,g,b en même temps (je modifisais image.pixel(x,y) et non pas chacune de ses 3 composantes). Après réctification j'obtient, à partir de l'image faible cobtraste :
+AVANT
+![](./images/photo_faible_contraste.jpg)
+APRES
+![](./output/Normalisation.png)
+
+## Exercice n°19 : Vortex
+
+Au début je faisais les changements sur l'image actuelle.
+Une fois que j'ai compris qu'il était nécessaire de d'utiliser une nouvelle image, j'ai parcouru l'image de base, calculer sa distance avec son centre pour chacun pixel, puis calcuelr un angle en fonction, pour end éduire une nouvelle psoition. Je copie ensuite le picel de base à la nouvelle position calculée sur la nouvelle image.
+Pour calculer l'angle j'ai divisé la disance par la distance max ( la diagonal avec pythagore), puis j'ai multiplié (en faisant des essais) par un coeffcient.
+J'obtient ainsi :
+
+![](./output/Vortex.png)
