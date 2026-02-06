@@ -735,10 +735,93 @@ sil::Image Filtre_Separable(sil::Image& image){
     }
 return resultimage;
 }
+
+
+
+sil::Image Filtre_Separable2(sil::Image& image){
+//on definit le kernel
+
+    sil::Image resultimage=image;
+    sil::Image tempimage=image;
+ 
+
+    //on sépare le kernel en 2 matrices en faisant 2 listes
+    float kernelX[4];
+    float kernelY[4];
+    for (int j = 0; j < 4; ++j){
+        kernelX[j]=1.0f/4;
+        kernelY[j]=1.0f/4;}
+
+//passage horizontale
+
+ for (int x{0}; x < image.width(); ++x){
+        for (int y{0}; y < image.height(); ++y){
+            //on stocke une couleur provisoire
+            glm::vec3 tempcolor{0.0f};
+            for(int k=0;k<4;k++){
+                int idx= std::min(std::max(x+k-4/2,0), image.width()-1);
+                tempcolor+=image.pixel(idx,y)*kernelX[k];
+
+            }
+            tempimage.pixel(x,y)=tempcolor;
+        }
+    }
+    //passahe varticale
+    for (int y = 0; y < image.height(); ++y) {
+        for (int x{0}; x < image.width(); ++x){
+            glm::vec3 tempcolor{0.0f};
+            for(int k=0;k<4;k++){
+                int idy= std::min(std::max(y+k-4/2,0), image.height()-1);
+                tempcolor+=tempimage.pixel(x,idy)*kernelY[k];
+             }
+             resultimage.pixel(x,y)=glm::clamp(tempcolor, 0.0f, 1.0f); 
+            }
+    }
+return resultimage;
+}
+
+
+
+
+
+
+
+
     
+sil::Image Difference_gaussienne(sil::Image& image){
+    sil::Image flou1=Filtre_Separable(image);
+    sil::Image flou2=Filtre_Separable2(image);
+    //image issue soustraction
+    int w = image.width();
+    int h = image.height();
+    sil::Image res(w, h);
+    for(int x=0;x<w;x++){
+        for (int y=0;y<h;y++){
+            glm::vec3 r= flou1.pixel(x,y)- flou2.pixel(x,y);
+            res.pixel(x,y)=glm::clamp(r,0.0f,1.0f);
+        }
+    }
+    //on passe au gris
+    //res.pixels= tableau de ts les pixels
+    for (glm::vec3& color: res.pixels()){
+        float c=color.r * 0.3 + color.g * 0.59 + color.b * 0.11;
+        color= glm::vec3{c}; //color prend la nv couleur calculée
+        float moy= (color.r+color.g+color.b)/3;
+        if (moy>0.015){
+            color={0.0f,0.0f,0.0f};} //noir
+        else{
+            color={1.0f,1.0f,1.0f}; //blanc
+        }
 
 
+        }
+    
+    return res;
+}
 
+//ne pas ouvlier les référence dasn la boucle
+//ne aps oublier de clamp apres sosyraction
+//erreur de priorité de calcul la honte
 int main()
 {
     {
@@ -869,4 +952,7 @@ int main()
 
         {sil::Image image{"images/logo.png"};
         Filtre_Separable(image).save("output/Filtre_Separable.png");}
+
+          {sil::Image image{"images/photo.jpg"};
+        Difference_gaussienne(image).save("output/Difference_gaussienne.png");}
 }

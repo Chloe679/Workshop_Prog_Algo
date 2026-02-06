@@ -86,9 +86,9 @@ J'au créé 2à image pour faire ce GIF.
 ### Partie 3 : Rosace
 
 Transformation coordonnée cartésiens en polaire avec cos et sin
-Puis j'ai divisé mon cercle (2\*pi) en le nombre de cercle que l'on veut. Ouis pr chaque itération je me ballade sur le cercle trigo
+Puis j'ai divisé mon cercle (2\*pi) en le nombre de cercle que l'on veut. Puis pr chaque itération je me ballade sur le cercle trigo
 Au début, j'avais mis mon angle theta en int au lieu de float donc cela a crééer ce léger décalage :
-
+![](./Echec_rosace.png)
 Avec rectification:
 ![](./output/Rosace.png)
 
@@ -179,6 +179,15 @@ J'ai repris mon code précédent, mais au lieu d'avoir un kernel, j'ai créé de
 Je n'avais pas fait attention mais le kernel doit être centré sur le pixel en question, sinon on floute seulement vers la droite et le bas. J'ai donc eu ce premier résultat que j'ai eu :
 
 Puis, j'avais un problème dans mes boucles (j'avais mis i<=16 au lieu de <16) il y avait un débordement et j'avais un résultat trop foncé
-:
+: ![](./Echec_flou2.png)
 Mais finalement, j'ai fini par avoir un résultat (rapide)
 ![](./output/Filtre_Separable.png)
+
+## Exercice n°17: Différence de Gaussienne
+
+J'avais oublié de passer par des références (oups...)
+J'avais aps compris qu'il fallait une étape en plus après avoir passé les pixels (issus de la soustraction) en gris. J'ai donc obtenu d'abord ce résultat...
+![](./Echec_gaussienne.png)
+de convertir ma soustraction (utiliser clamp )
+J'ai tester plusieurs valeurs pour choisir quel pixels mettre en blanc ou en noir, le coefficent 0.15 semblait être le meilleur.
+![](./output/Difference_gaussienne.png)
