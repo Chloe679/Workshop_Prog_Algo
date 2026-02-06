@@ -14,7 +14,7 @@ Mettre le bleu et le rouge à 0.
 
 Avec swap.
 
-![](./output/swichCanal.png)
+![](./output\switchCanal.png)
 
 ---
 
