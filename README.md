@@ -70,7 +70,7 @@ Puis j’ai remarqué qu’il fallait faire un "miroir" sur le nouvel axe des x.
 
 Ainsi, j’ai obtenu le résultat suivant :
 
-![](./images/Rotation.jpg)
+![](./output/Rotation.png)
 
 ---
 
