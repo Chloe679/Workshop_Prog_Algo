@@ -81,7 +81,7 @@ Pour le cercle, j'ai simplement ajouté une condition : le point doit être a l'
 ### Partie 2 : Animation
 
 J'au créé 2à image pour faire ce GIF.
-![](./output/Animation.gif)
+![](./GIF.gif)
 
 ### Partie 3 : Rosace
 
