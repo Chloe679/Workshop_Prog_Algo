@@ -158,3 +158,27 @@ Pour calculer l'angle j'ai divisé la disance par la distance max ( la diagonal 
 J'obtient ainsi :
 
 ![](./output/Vortex.png)
+
+## Exercice n°15 : Convolution
+
+J'ai d'abord essayer de modifier l'image passer en paramêtre, ce qui ne permettait pas d'obtenir le résultat souhaité. Ensuite j'ai eu du mal à comprendre pq quand j'affectais la nouvelle couleur au pixel (après application du karnel ça ne fonctionnait pas). J'ai fini par comprendre que c'était un soucis de valeur. Je savais que je devais utilsier clamp pour limiter une valeur à une plage donnée. Avec l'aide de mes camardes j'ai pu régler cette erreur.
+L'effet flou est léger mais je n'ai pas pu tester de changer de Kernel.
+J'ai mis un tab kernel à passer en paramètre afin de faciliter la suite des exercices
+![](./output/Convo.png)
+
+## Exercice n°16 : Sharpen, Emboss, Outline
+
+Grâce au code précédent, en définissant d'autre kernel on obtient les résultats suivants
+![](./output/Sharpen.png)
+![](./output/Emboss.png)
+![](./output/Outline.png)
+
+## Exercice n°17: Filtre séparable
+
+J'ai repris mon code précédent, mais au lieu d'avoir un kernel, j'ai créé deux listes (une qui "passe en horizontale, l'autre en verticale). Je me suis emmélée entre l'image de base, l'image intermédiaire, et l'image finale.
+Je n'avais pas fait attention mais le kernel doit être centré sur le pixel en question, sinon on floute seulement vers la droite et le bas. J'ai donc eu ce premier résultat que j'ai eu :
+
+Puis, j'avais un problème dans mes boucles (j'avais mis i<=16 au lieu de <16) il y avait un débordement et j'avais un résultat trop foncé
+:
+Mais finalement, j'ai fini par avoir un résultat (rapide)
+![](./output/Filtre_Separable.png)

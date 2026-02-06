@@ -637,15 +637,105 @@ sil::Image Vortex(sil::Image image) {
             }
     }
     return newimage;
+}//lisetes de Kernel pour exercices convolution,netteté, contours etc
+   float kernel_flou[3][3] = {
+        {0.0625,0.125,0.0625},
+        {0.125,0.25,0.125},
+        {0.0625,0.125,0.0625}
+    };
+
+    float kernel_outline[3][3] = {
+        {-1,-1,-1},
+        {-1,8,-1},
+        {-1,-1,-1}
+    };
+    float kernel_emboss[3][3] = {
+        {-2,-1,0},
+        {-1,1,1},
+        {0,1,2}
+    };
+
+    float kernel_sharpen[3][3] = {
+        {0,-1,0},
+        {-1,5,-1},
+        {0,-1,0}
+    };
+sil::Image Convo(sil::Image& image, float kernel[3][3]){
+    sil::Image newimage=image;
+ 
+    //on parcourt notre image 
+     for (int x{0}; x < image.width(); ++x)
+    {
+        for (int y{0}; y < image.height(); ++y)
+        {
+            //pr stocker le nv couleur
+            glm::vec3 nvcolor{0.0f};
+
+            //on parcourt les voisins du px
+            for(int dx=-1;dx<=1;dx++){
+                for(int dy=-1; dy<=1;dy++){
+                    //on verifie que les indices ne sont par hors de l'image
+                    int idx= std::min(std::max(x+dx,0), image.width()-1);
+                    int idy= std::min(std::max(y+dy,0), image.height()-1);
+                    //on applique le kernel
+                    nvcolor+=image.pixel(idx,idy)*kernel[dy+1][dx+1];
+                    
+                }
+            }
+               newimage.pixel(x,y)=glm::clamp(nvcolor, 0.0f,1.0f);
+            }
+        
+        }
+        return newimage;
 }
 
-//il faut recreer une image
 
 
 
 
 
+sil::Image Filtre_Separable(sil::Image& image){
+//on definit le kernel
 
+    sil::Image resultimage=image;
+    sil::Image tempimage=image;
+ 
+
+    //on sépare le kernel en 2 matrices en faisant 2 listes
+    float kernelX[16];
+    float kernelY[16];
+    for (int j = 0; j < 16; ++j){
+        kernelX[j]=1.0f/16;
+        kernelY[j]=1.0f/16;}
+
+//passage horizontale
+
+ for (int x{0}; x < image.width(); ++x){
+        for (int y{0}; y < image.height(); ++y){
+            //on stocke une couleur provisoire
+            glm::vec3 tempcolor{0.0f};
+            for(int k=0;k<16;k++){
+                int idx= std::min(std::max(x+k-16/2,0), image.width()-1);
+                tempcolor+=image.pixel(idx,y)*kernelX[k];
+
+            }
+            tempimage.pixel(x,y)=tempcolor;
+        }
+    }
+    //passahe varticale
+    for (int y = 0; y < image.height(); ++y) {
+        for (int x{0}; x < image.width(); ++x){
+            glm::vec3 tempcolor{0.0f};
+            for(int k=0;k<16;k++){
+                int idy= std::min(std::max(y+k-16/2,0), image.height()-1);
+                tempcolor+=tempimage.pixel(x,idy)*kernelY[k];
+             }
+             resultimage.pixel(x,y)=glm::clamp(tempcolor, 0.0f, 1.0f); 
+            }
+    }
+return resultimage;
+}
+    
 
 
 
@@ -763,4 +853,20 @@ int main()
     {sil::Image image{"images/logo.png"};
         Tri_pixel(image);
         image.save("output/Tri.png");}
+
+        {sil::Image image{"images/logo.png"};
+        Convo(image,kernel_flou).save("output/Convo.png");}
+
+        {sil::Image image{"images/logo.png"};
+        Convo(image,kernel_emboss).save("output/Emboss.png");}
+
+        
+        {sil::Image image{"images/logo.png"};
+        Convo(image,kernel_outline).save("output/Outline.png");}
+
+        {sil::Image image{"images/logo.png"};
+        Convo(image,kernel_sharpen).save("output/Sharpen.png");}
+
+        {sil::Image image{"images/logo.png"};
+        Filtre_Separable(image).save("output/Filtre_Separable.png");}
 }
